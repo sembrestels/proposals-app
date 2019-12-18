@@ -1,0 +1,44 @@
+{
+  "roles": [
+    {
+      "name": "Create a proposal",
+      "id": "CREATE_PROPOSAL_ROLE",
+      "params": []
+    },
+    {
+      "name": "Edit a proposal",
+      "id": "EDIT_PROPOSAL_ROLE",
+      "params": []
+    },
+    {
+      "name": "Accept a proposal",
+      "id": "ACCEPT_PROPOSAL_ROLE",
+      "params": []
+    }
+  ],
+  "environments": {
+    "default": {
+      "network": "development",
+      "appName": "proposals.open.aragonpm.eth"
+    },
+    "rinkeby": {
+      "registry": "0x98df287b6c145399aaa709692c8d308357bc085d",
+      "appName": "proposals.open.aragonpm.eth",
+      "wsRPC": "wss://rinkeby.eth.aragon.network/ws",
+      "network": "rinkeby"
+    },
+    "staging": {
+      "registry": "0xfe03625ea880a8cba336f9b5ad6e15b0a3b5a939",
+      "appName": "proposals.open.aragonpm.eth",
+      "wsRPC": "wss://rinkeby.eth.aragon.network/ws",
+      "network": "rinkeby"
+    },
+    "mainnet": {
+      "registry": "0x314159265dd8dbb310642f98f50c066173c1259b",
+      "appName": "proposals.open.aragonpm.eth",
+      "wsRPC": "wss://mainnet.eth.aragon.network/ws",
+      "network": "mainnet"
+    }
+  },
+  "path": "contracts/Proposals.sol"
+}
