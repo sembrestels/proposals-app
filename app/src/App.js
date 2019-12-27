@@ -1,53 +1,113 @@
-import React from 'react'
-import { useAragonApi } from '@aragon/api-react'
-import { Main, Button } from '@aragon/ui'
-import styled from 'styled-components'
+import React, { useCallback } from 'react'
+import {
+  Button,
+  Header,
+  IconPlus,
+  Main,
+  SyncIndicator,
+  useLayout,
+} from '@aragon/ui'
+import { useGuiStyle } from '@aragon/api-react'
+import NewProposalPanel from './components/NewProposalPanel'
+import useFilterProposals from './hooks/useFilterProposals'
+import useScrollTop from './hooks/useScrollTop'
+import NoProposals from './screens/NoProposals'
+import ProposalDetail from './screens/ProposalDetail'
+import Proposals from './screens/Proposals'
+import { AppLogicProvider, useAppLogic } from './app-logic'
+import { IdentityProvider } from './identity-manager'
+import { SettingsProvider } from './proposal-settings-manager'
 
-function App() {
-  const { api, appState } = useAragonApi()
-  const { count, isSyncing } = appState
-  console.log(count, isSyncing)
+const App = React.memo(function App() {
+  const {
+    actions,
+    isSyncing,
+    newProposalPanel,
+    selectProposal,
+    selectedProposal,
+    proposals,
+  } = useAppLogic()
+
+  const { appearance } = useGuiStyle()
+  const { layoutName } = useLayout()
+  const compactMode = layoutName === 'small'
+  const handleBack = useCallback(() => selectProposal(-1), [selectProposal])
+
+  const {
+    filteredProposals,
+    proposalStatusFilter,
+    handleProposalStatusFilterChange,
+  } = useFilterProposals(proposals)
+
+  useScrollTop(selectedProposal)
+
   return (
-    <Main>
-      <BaseLayout>
-        {isSyncing && <Syncing />}
-        <Count>Count: {count}</Count>
-        <Buttons>
-          <Button mode="secondary" onClick={() => api.decrement(1).toPromise()}>
-            Decrement
-          </Button>
-          <Button mode="secondary" onClick={() => api.increment(1).toPromise()}>
-            Increment
-          </Button>
-        </Buttons>
-      </BaseLayout>
+    <Main theme={appearance} assetsUrl="./aragon-ui">
+      <React.Fragment>
+        {proposals.length === 0 && (
+          <div
+            css={`
+              height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            `}
+          >
+            <NoProposals
+              onNewProposal={newProposalPanel.requestOpen}
+              isSyncing={isSyncing}
+            />
+          </div>
+        )}
+        {proposals.length > 0 && (
+          <React.Fragment>
+            <SyncIndicator visible={isSyncing} />
+            <Header
+              primary="Voting"
+              secondary={
+                !selectedProposal && (
+                  <Button
+                    mode="strong"
+                    onClick={newProposalPanel.requestOpen}
+                    label="New proposal"
+                    icon={<IconPlus />}
+                    display={compactMode ? 'icon' : 'label'}
+                  />
+                )
+              }
+            />
+            {selectedProposal ? (
+              <ProposalDetail proposal={selectedProposal} onBack={handleBack} />
+            ) : (
+              <Proposals
+                proposals={proposals}
+                selectProposal={selectProposal}
+                filteredProposals={filteredProposals}
+                proposalStatusFilter={proposalStatusFilter}
+                handleProposalStatusFilterChange={
+                  handleProposalStatusFilterChange
+                }
+              />
+            )}
+          </React.Fragment>
+        )}
+        <NewProposalPanel
+          onCreateProposal={actions.createProposal}
+          panelState={newProposalPanel}
+        />
+      </React.Fragment>
     </Main>
   )
+})
+
+export default function Voting() {
+  return (
+    <AppLogicProvider>
+      <IdentityProvider>
+        <SettingsProvider>
+          <App />
+        </SettingsProvider>
+      </IdentityProvider>
+    </AppLogicProvider>
+  )
 }
-
-const BaseLayout = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  flex-direction: column;
-`
-
-const Count = styled.h1`
-  font-size: 30px;
-`
-
-const Buttons = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-  grid-gap: 40px;
-  margin-top: 20px;
-`
-
-const Syncing = styled.div.attrs({ children: 'Syncing…' })`
-  position: absolute;
-  top: 15px;
-  right: 20px;
-`
-
-export default App
