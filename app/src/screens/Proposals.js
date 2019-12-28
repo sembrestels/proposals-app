@@ -1,7 +1,9 @@
 import React from 'react'
 import {
   Bar,
+  DataView,
   DropDown,
+  Link,
   Tag,
   GU,
   textStyle,
@@ -67,7 +69,13 @@ const Proposals = React.memo(function Proposals({
           </div>
         </Bar>
       )}
-      <div>Proposals</div>
+      <DataView
+        fields={['Title']}
+        entries={filteredProposals}
+        renderEntry={({ id, title }) => [
+          <Link onClick={() => selectProposal(id)}>{`#${id} - ${title}`}</Link>,
+        ]}
+      />
     </React.Fragment>
   )
 })

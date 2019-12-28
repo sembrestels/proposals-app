@@ -15,7 +15,7 @@ function testStatusFilter(filter, proposalStatus) {
     (filter === STATUS_FILTER_OPEN &&
       proposalStatus === PROPOSAL_STATUS_OPEN) ||
     (filter === STATUS_FILTER_CLOSED &&
-      proposalStatus !== PROPOSAL_STATUS_ACCEPTED)
+      proposalStatus === PROPOSAL_STATUS_ACCEPTED)
   )
 }
 

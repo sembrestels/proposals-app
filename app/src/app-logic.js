@@ -7,7 +7,7 @@ import { noop } from './utils'
 const PROPOSAL_ID_PATH_RE = /^\/proposal\/([0-9]+)\/?$/
 const NO_PROPOSAL_ID = '-1'
 
-function proposalIdFromPath(path) {
+function idFromPath(path) {
   if (!path) {
     return NO_PROPOSAL_ID
   }
@@ -18,28 +18,24 @@ function proposalIdFromPath(path) {
 // Get the proposal currently selected, or null otherwise.
 export function useSelectedProposal(proposals) {
   const [path, requestPath] = usePath()
-  const { ready } = useAppState()
+  const { isSyncing } = useAppState()
 
   // The memoized proposal currently selected.
   const selectedProposal = useMemo(() => {
-    const proposalId = proposalIdFromPath(path)
+    const id = idFromPath(path)
 
-    // The `ready` check prevents a proposal to be
+    // The `isSyncing` check prevents a proposal to be
     // selected until the app state is fully ready.
-    if (!ready || proposalId === NO_PROPOSAL_ID) {
+    if (isSyncing || id === NO_PROPOSAL_ID) {
       return null
     }
 
-    return (
-      proposals.find(proposal => proposal.proposalId === proposalId) || null
-    )
-  }, [path, ready, proposals])
+    return proposals.find(proposal => proposal.id === id) || null
+  }, [path, isSyncing, proposals])
 
   const selectProposal = useCallback(
-    proposalId => {
-      requestPath(
-        String(proposalId) === NO_PROPOSAL_ID ? '' : `/proposal/${proposalId}/`
-      )
+    id => {
+      requestPath(String(id) === NO_PROPOSAL_ID ? '' : `/proposal/${id}/`)
     },
     [requestPath]
   )
@@ -64,7 +60,7 @@ export function useCreateProposalAction(onDone = noop) {
 
 // Handles the main logic of the app.
 export function useAppLogic() {
-  const { isSyncing, ready, proposals } = useAppState()
+  const { isSyncing, proposals = [] } = useAppState()
 
   const [selectedProposal, selectProposal] = useSelectedProposal(proposals)
   const newProposalPanel = usePanelState()
@@ -75,7 +71,7 @@ export function useAppLogic() {
 
   return {
     actions,
-    isSyncing: isSyncing || !ready,
+    isSyncing: isSyncing,
     newProposalPanel,
     selectProposal,
     selectedProposal,

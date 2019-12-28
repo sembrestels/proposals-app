@@ -1,6 +1,10 @@
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 import Aragon, { events } from '@aragon/api'
+import {
+  PROPOSAL_STATUS_OPEN,
+  PROPOSAL_STATUS_ACCEPTED,
+} from './proposal-utils'
 
 const app = new Aragon()
 
@@ -10,17 +14,26 @@ app.store(async (state, { event }) => {
   // Initial state
   if (state == null) {
     nextState = {
-      count: await getValue(),
+      proposals: [
+        {
+          id: '0',
+          title: 'Example proposal',
+          description: 'It is a hardcoded proposal',
+          creator: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          state: PROPOSAL_STATUS_OPEN,
+        },
+        {
+          id: '1',
+          title: 'Another proposal',
+          description: 'It is another hardcoded proposal',
+          creator: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          state: PROPOSAL_STATUS_ACCEPTED,
+        },
+      ],
     }
   }
 
   switch (event) {
-    case 'Increment':
-      nextState = { ...nextState, count: await getValue() }
-      break
-    case 'Decrement':
-      nextState = { ...nextState, count: await getValue() }
-      break
     case events.SYNC_STATUS_SYNCING:
       nextState = { ...nextState, isSyncing: true }
       break
@@ -31,7 +44,3 @@ app.store(async (state, { event }) => {
 
   return nextState
 })
-
-async function getValue() {
-  return parseInt(await app.call('value').toPromise(), 10)
-}

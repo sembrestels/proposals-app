@@ -63,7 +63,7 @@ const App = React.memo(function App() {
           <React.Fragment>
             <SyncIndicator visible={isSyncing} />
             <Header
-              primary="Voting"
+              primary="Proposals"
               secondary={
                 !selectedProposal && (
                   <Button
@@ -100,7 +100,7 @@ const App = React.memo(function App() {
   )
 })
 
-export default function Voting() {
+export default function ProposalsApp() {
   return (
     <AppLogicProvider>
       <IdentityProvider>

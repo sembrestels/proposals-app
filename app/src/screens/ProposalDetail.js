@@ -22,7 +22,7 @@ function ProposalDetail({ proposal, onBack }) {
   const { layoutName } = useLayout()
   const connectedAccount = useConnectedAccount()
 
-  const { proposalId, title, description, creator } = proposal
+  const { id, title, description, creator } = proposal
 
   return (
     <React.Fragment>
@@ -45,8 +45,7 @@ function ProposalDetail({ proposal, onBack }) {
                   ${textStyle('title2')};
                 `}
               >
-                <span css="font-weight: bold;">Proposal #{proposalId}</span>{' '}
-                {title}
+                <span css="font-weight: bold;">Proposal #{id}</span> - {title}
               </h1>
               <div
                 css={`
@@ -68,11 +67,12 @@ function ProposalDetail({ proposal, onBack }) {
                     Description
                   </h2>
                   <Text
-                    text={description || DEFAULT_DESCRIPTION}
                     css={`
                       ${textStyle('body2')};
                     `}
-                  />
+                  >
+                    {description || DEFAULT_DESCRIPTION}
+                  </Text>
                 </div>
                 <div>
                   <h2
